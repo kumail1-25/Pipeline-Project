@@ -3,10 +3,10 @@ name: Pulumi Pipeline
 on:
   push:
     branches:
-      - main # Trigger the pipeline when changes are pushed to the 'main' branch
+      - main # Trigger the pipeline on 'main' branch push
   pull_request:
     branches:
-      - main # Trigger the pipeline when a pull request is made to the 'main' branch
+      - main # Trigger on pull requests to 'main' branch
 
 jobs:
   deploy:
@@ -27,21 +27,32 @@ jobs:
         pip install -r requirements.txt
         pip install pulumi pulumi_aws  # Ensure Pulumi and required libraries are installed
 
-    - name: Configure AWS Credentials (or LocalStack for Local Development)
-      run: |
-        export AWS_ACCESS_KEY_ID=test
-        export AWS_SECRET_ACCESS_KEY=test
-        export AWS_DEFAULT_REGION=us-east-1
-        
+    - name: Configure AWS Credentials (for LocalStack)
+      env:
+        AWS_ACCESS_KEY_ID: test
+        AWS_SECRET_ACCESS_KEY: test
+        AWS_DEFAULT_REGION: us-east-1
+      run: echo "AWS credentials configured for LocalStack"
+
     - name: Set Pulumi Access Token
       run: echo "PULUMI_ACCESS_TOKEN=${{ secrets.PULUMI_ACCESS_TOKEN }}" >> $GITHUB_ENV  
-      
+
     - name: Set Pulumi Config Passphrase
       run: echo "PULUMI_CONFIG_PASSPHRASE=${{ secrets.PULUMI_CONFIG_PASSPHRASE }}" >> $GITHUB_ENV
-      
+
     - name: Create the dev stack (if it doesn't exist)
+      env:
+        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+        PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
       run: |
-          pulumi stack init dev || echo "Dev stack already exists"
+        pulumi stack init dev || echo "Dev stack already exists"
+
+    - name: Deploy resources using Pulumi
+      env:
+        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+        PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+      run: pulumi up --yes --stack dev
+
 
     - name: Run Pulumi Preview
       run: |
