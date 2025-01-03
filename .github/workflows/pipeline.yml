@@ -41,7 +41,7 @@ jobs:
    
    
     - name: Run Pulumi Preview
-      run: pulumi preview --stack dev  # Preview the changes
+      run: pulumi up --stack dev --yes  # Preview the changes
 
     # Optional: If you want to deploy, you can run pulumi up instead
     - name: Pulumi Up (Deploy)
