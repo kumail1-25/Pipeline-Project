@@ -48,7 +48,7 @@ jobs:
           pulumi stack init dev || echo "Dev stack already exists"
 
     - name: Run Pulumi Preview
-      run: pulumi preview --stack dev --non-interactive --disable-preview
+      run: pulumi preview --stack dev 
 
     - name: Run Pulumi Up
       run: |
