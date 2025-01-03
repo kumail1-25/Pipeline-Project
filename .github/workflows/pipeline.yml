@@ -27,12 +27,17 @@ jobs:
         pip install -r requirements.txt
         pip install pulumi pulumi_aws  # Ensure Pulumi and required libraries are installed
 
-    - name: Configure AWS Credentials for LocalStack
+    - name: Run LocalStack Docker container
+      uses: localstack/localstack-action@v1
+      with:
+        debug: true
+
+    - name: Set AWS Credentials for LocalStack
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}  # LocalStack endpoint for services like S3
+        AWS_ACCESS_KEY_ID: "test"  # Fake credentials for LocalStack
+        AWS_SECRET_ACCESS_KEY: "test"  # Fake credentials for LocalStack
+        AWS_DEFAULT_REGION: "us-east-1"  # Set the region for LocalStack
+        AWS_ENDPOINT_URL: "http://localhost:4566"  # LocalStack endpoint URL
       run: |
         echo "AWS credentials configured for LocalStack"
         echo "Setting LocalStack endpoint to ${AWS_ENDPOINT_URL}"
